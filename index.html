@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Forecast</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e5799, #207cca, #2989d8, #1e5799);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            min-height: 100vh;
+            padding: 20px;
+            color: #fff;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            margin-bottom: 30px;
+            text-align: center;
+            animation: fadeInDown 1s ease;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 15px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .tagline {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 500px;
+            margin: 0 auto 20px;
+        }
+
+        .search-container {
+            display: flex;
+            max-width: 500px;
+            margin: 0 auto 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            border-radius: 50px;
+            overflow: hidden;
+            animation: fadeIn 1.2s ease;
+        }
+
+        input {
+            flex: 1;
+            padding: 15px 25px;
+            border: none;
+            font-size: 1.1rem;
+            outline: none;
+            background: rgba(255,255,255,0.9);
+        }
+
+        button {
+            padding: 0 30px;
+            border: none;
+            background: #FF6B6B;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background: #FF5252;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+
+        .tab-button {
+            padding: 12px 25px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 30px;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .tab-button.active {
+            background: rgba(255,255,255,0.35);
+            font-weight: bold;
+        }
+
+        .tab-button:hover:not(.active) {
+            background: rgba(255,255,255,0.25);
+        }
+
+        .weather-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .weather-box {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.18);
+            animation: fadeInUp 0.8s ease;
+        }
+
+        #currentWeather {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #currentWeather h2 {
+            font-size: 2rem;
+            margin-bottom: 15px;
+        }
+
+        .current-weather-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+            width: 100%;
+            flex-wrap: wrap;
+        }
+
+        .temp-display {
+            font-size: 4rem;
+            font-weight: bold;
+            position: relative;
+        }
+
+        .temp-display::after {
+            content: "°C";
+            position: absolute;
+            font-size: 1.5rem;
+            top: 10px;
+        }
+
+        .weather-icon-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .weather-icon {
+            width: 100px;
+            height: 100px;
+            background: rgba(255,255,255,0.25);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+        }
+
+        .weather-icon img {
+            width: 100%;
+        }
+
+        .condition {
+            font-size: 1.4rem;
+            font-weight: 500;
+        }
+
+        .weather-details {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 100px;
+        }
+
+        .detail-item i {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            color: #FFD166;
+        }
+
+        .detail-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .detail-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+
+        #forecastWeather {
+            display: none;
+        }
+
+        .forecast-title {
+            font-size: 1.6rem;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .forecast-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+        }
+
+        .forecast-day {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 20px 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            transition: transform 0.3s ease;
+        }
+
+        .forecast-day:hover {
+            transform: translateY(-5px);
+            background: rgba(255,255,255,0.15);
+        }
+
+        .day-name {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .forecast-icon {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .forecast-icon img {
+            width: 100%;
+        }
+
+        .forecast-temp {
+            font-weight: bold;
+            font-size: 1.3rem;
+        }
+
+        .min-temp {
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+
+        .error-message {
+            color: #FF6B6B;
+            background: rgba(0,0,0,0.2);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        footer {
+            margin-top: 30px;
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 { font-size: 2.2rem; }
+            .current-weather-content { flex-direction: column; }
+            .temp-display { font-size: 3.5rem; }
+            .forecast-container { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-cloud-sun"></i> Weather Forecast</h1>
+            <p class="tagline">Get accurate weather updates and 7-day forecasts for any location</p>
+            
+            <div class="search-container">
+                <input type="text" id="locationInput" placeholder="Enter city name...">
+                <button onclick="getWeather()"><i class="fas fa-search"></i> Search</button>
+            </div>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-button active" onclick="showTab('current')">Current Weather</button>
+            <button class="tab-button" onclick="showTab('forecast')">7-Day Forecast</button>
+        </div>
+
+        <div class="weather-container">
+            <div id="currentWeather" class="weather-box">
+                <h2 id="city">Search for a city</h2>
+                <div class="current-weather-content">
+                    <div class="temp-display" id="temp">--</div>
+                    <div class="weather-icon-container">
+                        <div class="weather-icon">
+                            <img id="icon" src="https://cdn.weatherapi.com/weather/64x64/day/113.png" alt="Weather Icon">
+                        </div>
+                        <div class="condition" id="condition">--</div>
+                    </div>
+                </div>
+                <div class="weather-details">
+                    <div class="detail-item">
+                        <i class="fas fa-tint"></i>
+                        <div class="detail-value" id="humidity">--%</div>
+                        <div class="detail-label">Humidity</div>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-wind"></i>
+                        <div class="detail-value" id="wind">-- kph</div>
+                        <div class="detail-label">Wind Speed</div>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-compress"></i>
+                        <div class="detail-value" id="pressure">-- mb</div>
+                        <div class="detail-label">Pressure</div>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-eye"></i>
+                        <div class="detail-value" id="visibility">-- km</div>
+                        <div class="detail-label">Visibility</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="forecastWeather" class="weather-box">
+                <h3 class="forecast-title">7-Day Forecast</h3>
+                <div class="forecast-container" id="forecastContainer">
+                    <!-- Forecast days will be populated here -->
+                </div>
+            </div>
+        </div>
+
+        <div class="error-message" id="errorMessage">
+            Location not found. Please try again.
+        </div>
+
+        <footer>
+            <p>Weather Forecast App &copy; 2023 | Powered by WeatherAPI</p>
+        </footer>
+    </div>
+
+    <script>
+        // API key
+        const apiKey = "6289335722e24077977191923250108";
+        
+        // DOM elements
+        const locationInput = document.getElementById("locationInput");
+        const cityElement = document.getElementById("city");
+        const iconElement = document.getElementById("icon");
+        const conditionElement = document.getElementById("condition");
+        const tempElement = document.getElementById("temp");
+        const humidityElement = document.getElementById("humidity");
+        const windElement = document.getElementById("wind");
+        const pressureElement = document.getElementById("pressure");
+        const visibilityElement = document.getElementById("visibility");
+        const errorMessage = document.getElementById("errorMessage");
+        const forecastContainer = document.getElementById("forecastContainer");
+        const currentWeather = document.getElementById("currentWeather");
+        const forecastWeather = document.getElementById("forecastWeather");
+
+        // Set default location to London
+        window.onload = function() {
+            getWeather("London");
+        };
+
+        // Get weather data
+        async function getWeather(location = null) {
+            const loc = location || locationInput.value;
+            
+            if (!loc) {
+                showError("Please enter a location.");
+                return;
+            }
+
+            try {
+                // Fetch current weather
+                const currentUrl = `https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${loc}`;
+                const currentResponse = await fetch(currentUrl);
+                
+                if (!currentResponse.ok) {
+                    throw new Error("Location not found");
+                }
+                
+                const currentData = await currentResponse.json();
+                
+                // Update current weather UI
+                cityElement.innerText = `${currentData.location.name}, ${currentData.location.country}`;
+                iconElement.src = `https:${currentData.current.condition.icon}`;
+                conditionElement.innerText = currentData.current.condition.text;
+                tempElement.innerText = currentData.current.temp_c;
+                humidityElement.innerText = `${currentData.current.humidity}%`;
+                windElement.innerText = `${currentData.current.wind_kph} kph`;
+                pressureElement.innerText = `${currentData.current.pressure_mb} mb`;
+                visibilityElement.innerText = `${currentData.current.vis_km} km`;
+                
+                // Hide error message
+                errorMessage.style.display = "none";
+                
+                // Fetch forecast
+                getForecast(loc);
+                
+            } catch (error) {
+                showError(error.message);
+            }
+        }
+
+        // Get 7-day forecast
+        async function getForecast(location) {
+            try {
+                const forecastUrl = `https://api.weatherapi.com/v1/forecast.json?key=${apiKey}&q=${location}&days=7`;
+                const forecastResponse = await fetch(forecastUrl);
+                
+                if (!forecastResponse.ok) {
+                    throw new Error("Failed to get forecast");
+                }
+                
+                const forecastData = await forecastResponse.json();
+                updateForecastUI(forecastData.forecast.forecastday);
+                
+            } catch (error) {
+                console.error("Error fetching forecast:", error);
+            }
+        }
+
+        // Update forecast UI
+        function updateForecastUI(forecastDays) {
+            forecastContainer.innerHTML = "";
+            
+            forecastDays.forEach(day => {
+                const date = new Date(day.date);
+                const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
+                
+                const forecastDay = document.createElement("div");
+                forecastDay.className = "forecast-day";
+                forecastDay.innerHTML = `
+                    <div class="day-name">${dayName}</div>
+                    <div class="forecast-icon">
+                        <img src="https:${day.day.condition.icon}" alt="${day.day.condition.text}">
+                    </div>
+                    <div class="forecast-temp">${day.day.maxtemp_c}°</div>
+                    <div class="min-temp">${day.day.mintemp_c}°</div>
+                `;
+                
+                forecastContainer.appendChild(forecastDay);
+            });
+        }
+
+        // Show error message
+        function showError(message) {
+            errorMessage.innerText = message;
+            errorMessage.style.display = "block";
+            
+            // Hide after 5 seconds
+            setTimeout(() => {
+                errorMessage.style.display = "none";
+            }, 5000);
+        }
+
+        // Show/hide tabs
+        function showTab(tabName) {
+            // Update active tab button
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            if (tabName === 'current') {
+                document.querySelector('.tab-button:nth-child(1)').classList.add('active');
+                currentWeather.style.display = "flex";
+                forecastWeather.style.display = "none";
+            } else {
+                document.querySelector('.tab-button:nth-child(2)').classList.add('active');
+                currentWeather.style.display = "none";
+                forecastWeather.style.display = "block";
+            }
+        }
+
+        // Allow Enter key to trigger search
+        locationInput.addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                getWeather();
+            }
+        });
+    </script>
+</body>
+</html>
